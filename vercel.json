@@ -1,6 +1,6 @@
 {
   "rootDirectory": "apps/web",
-  "buildCommand": "bun run build",
+  "buildCommand": "bunx react-router build",
   "outputDirectory": "build/client",
   "installCommand": "bun install"
 }
