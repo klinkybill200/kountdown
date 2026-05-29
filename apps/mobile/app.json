@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Kountdown",
-    "slug": "966160e9-2043-4afb-95e4-f5b3217b98c4",
+    "slug": "kountdown",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -65,12 +65,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "6f80b964-8f4d-4a38-b0ef-b4adc5d48f12"
+        "projectId": "b62fc21f-ee82-43fe-85e2-9ef12d8aed42"
       }
     },
-    "owner": "create-inc",
-    "updates": {
-      "url": "https://u.expo.dev/6f80b964-8f4d-4a38-b0ef-b4adc5d48f12"
-    }
+    "owner": "klinkybill2000"
   }
 }
