@@ -34,5 +34,8 @@ yarn-error.*
 
 app-example
 
+# Let EAS use npm install instead of npm ci
+package-lock.json
+
 caches/
 public/
