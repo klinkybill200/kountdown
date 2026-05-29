@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C \"/Users/andreasklingenberger/Desktop/kountdown source\" remote -v)"
+    ]
+  }
+}

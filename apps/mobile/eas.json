@@ -1,0 +1,36 @@
+{
+	"cli": {
+		"version": ">= 15.0.15",
+		"appVersionSource": "remote"
+	},
+	"build": {
+		"development": {
+			"developmentClient": true,
+			"distribution": "internal"
+		},
+		"preview": {
+			"distribution": "internal"
+		},
+		"production": {
+			"autoIncrement": true,
+			"android": {
+				"buildType": "app-bundle"
+			}
+		}
+	},
+	"submit": {
+		"production": {
+			"ios": {
+				"appleId": "klinkybill@gmail.com",
+				"ascAppId": "6774498136",
+				"appleTeamId": "585EA8WD3H"
+			},
+			"android": {
+				"serviceAccountKeyPath": "./google-service-account.json",
+				"track": "internal",
+				"releaseStatus": "draft",
+				"changesNotSentForReview": false
+			}
+		}
+	}
+}
