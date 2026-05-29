@@ -34,8 +34,12 @@ jobs:
 
       - name: Build iOS (production)
         working-directory: apps/mobile
-        run: eas build --platform ios --profile production --non-interactive
+        id: build
+        run: |
+          BUILD_ID=$(eas build --platform ios --profile production --non-interactive --json --no-wait | jq -r '.[0].id')
+          echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
+          eas build:wait --id $BUILD_ID
 
       - name: Submit to App Store
         working-directory: apps/mobile
-        run: eas submit --platform ios --profile production --non-interactive
+        run: eas submit --platform ios --profile production --non-interactive --id ${{ steps.build.outputs.build_id }}
