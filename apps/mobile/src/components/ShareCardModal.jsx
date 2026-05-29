@@ -39,6 +39,7 @@ import {
   useImage,
 } from "@shopify/react-native-skia";
 import * as FileSystem from "expo-file-system/legacy";
+import * as MediaLibrary from "expo-media-library";
 import { X, Share2, Star, ExternalLink } from "lucide-react-native";
 import { useStore } from "@/store/useStore";
 import { useInAppPurchase } from "@/utils/iap";
@@ -301,7 +302,7 @@ function AdOverlay({ onDone, onUpgrade, purchasing }) {
         disabled={purchasing}
         style={{
           marginHorizontal: 20,
-          marginBottom: 20,
+          marginBottom: 10,
           backgroundColor: "#FFB300",
           borderRadius: 16,
           padding: 16,
@@ -323,6 +324,39 @@ function AdOverlay({ onDone, onUpgrade, purchasing }) {
           </>
         )}
       </Pressable>
+
+      {/* Inactive share button with countdown */}
+      <View
+        style={{
+          marginHorizontal: 20,
+          marginBottom: 20,
+          backgroundColor: "#2A2A2A",
+          borderRadius: 16,
+          padding: 16,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 8,
+          borderWidth: 1,
+          borderColor: "#3A3A3A",
+        }}
+      >
+        <Share2 color="#555" size={18} />
+        <Text style={{ color: "#555", fontWeight: "700", fontSize: 16 }}>
+          Share card
+        </Text>
+        <View style={{
+          backgroundColor: "#333",
+          borderRadius: 10,
+          paddingHorizontal: 8,
+          paddingVertical: 3,
+          marginLeft: 4,
+        }}>
+          <Text style={{ color: "#FFB300", fontWeight: "700", fontSize: 13 }}>
+            {secondsLeft}s
+          </Text>
+        </View>
+      </View>
     </View>
   );
 }
@@ -411,11 +445,16 @@ function ShareCardInner({
         unitLabel ?? ""
       }${linkLine}\n\nShared via Kountdown`;
 
-      // iOS: url= sends the actual PNG image to WhatsApp, Mail, Instagram, iMessage etc.
-      // Android: url= + message= for broadest compatibility
+      // Save image to camera roll
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      if (status === "granted") {
+        await MediaLibrary.saveToLibraryAsync(uri);
+      }
+
+      // Share text + link via native Share Sheet (works reliably in all apps)
       await Share.share(
-        { url: uri, message, title: message },
-        { dialogTitle: "Share your Kountdown card" },
+        { message, title: message },
+        { dialogTitle: "Share your Kountdown" },
       );
     } catch (e) {
       console.error("[ShareCard] error:", e);
@@ -705,6 +744,16 @@ function ShareCardInner({
             {isPro
               ? "Kountdown Pro — no ads"
               : "WhatsApp · Mail · Instagram · iMessage"}
+          </Text>
+          <Text
+            style={{
+              color: "#666",
+              fontSize: 11,
+              marginTop: 6,
+              textAlign: "center",
+            }}
+          >
+            🖼 Karte wird in Fotos gespeichert · 🔗 Link wird geteilt
           </Text>
 
           {/* ── Ad overlay — absolute View in THIS modal, NOT a nested Modal ── */}

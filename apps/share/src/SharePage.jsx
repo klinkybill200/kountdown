@@ -366,11 +366,13 @@ export default function SharePage() {
           <span
             className="hero-shimmer"
             style={{
-              fontSize: 78,
+              fontSize: value.length > 9 ? 42 : value.length > 6 ? 58 : 78,
               fontWeight: "900",
-              letterSpacing: -4,
+              letterSpacing: value.length > 9 ? -1 : -4,
               lineHeight: 1,
               marginBottom: 6,
+              wordBreak: "break-all",
+              textAlign: "center",
             }}
           >
             {value}
