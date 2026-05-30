@@ -22,7 +22,6 @@
 				"EXPO_PUBLIC_HOST": "kountdown.vercel.app",
 				"EXPO_PUBLIC_CREATE_ENV": "PRODUCTION",
 				"EXPO_PUBLIC_REVENUE_CAT_APP_STORE_API_KEY": "appl_NuxWvpadbTNUptStkDBrWcZCTMw",
-				"EXPO_PUBLIC_REVENUE_CAT_PLAY_STORE_API_KEY": "",
 				"EXPO_PUBLIC_CREATE_LD_MOBILE_KEY": "prod-placeholder"
 			}
 		}
