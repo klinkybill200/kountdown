@@ -52,9 +52,10 @@ function getFirstDayOfMonth(year, month) {
 }
 
 const currentYear = new Date().getFullYear();
+const MAX_YEAR = currentYear + 50;
 const YEARS = Array.from(
-  { length: currentYear - 1899 },
-  (_, i) => currentYear - i,
+  { length: MAX_YEAR - 1899 },
+  (_, i) => MAX_YEAR - i,
 );
 
 export default function CustomDatePicker({

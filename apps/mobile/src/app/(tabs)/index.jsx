@@ -496,7 +496,7 @@ export default function AgeCalcScreen() {
         value={selectedDate}
         onChange={setSelectedDate}
         onClose={() => setShowPicker(false)}
-        maxDate={new Date().toISOString().split("T")[0]}
+        maxDate={null}
       />
 
       <ShareCardModal
