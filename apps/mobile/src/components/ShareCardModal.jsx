@@ -24,6 +24,8 @@ import {
   Linking,
   Image,
   StyleSheet,
+  ScrollView,
+  KeyboardAvoidingView,
 } from "react-native";
 import {
   Canvas,
@@ -40,13 +42,14 @@ import {
 } from "@shopify/react-native-skia";
 import * as FileSystem from "expo-file-system/legacy";
 import * as MediaLibrary from "expo-media-library";
+import * as Sharing from "expo-sharing";
 import { X, Share2, Star, ExternalLink } from "lucide-react-native";
 import { useStore } from "@/store/useStore";
 import { useInAppPurchase } from "@/utils/iap";
 
 const { width: SW } = Dimensions.get("window");
 const CARD_W = SW - 48;
-const CARD_H = CARD_W * 1.25;
+const CARD_H = CARD_W * 1.1;
 const AD_DURATION = 7;
 
 const AD_APPS = [
@@ -159,204 +162,215 @@ function AdOverlay({ onDone, onUpgrade, purchasing }) {
     <View
       style={[
         StyleSheet.absoluteFillObject,
-        { borderRadius: 28, overflow: "hidden", backgroundColor: "#111111" },
+        { borderRadius: 28, backgroundColor: "#111111", overflow: "hidden" },
       ]}
     >
-      {/* Progress bar */}
+      {/* Progress bar — always on top */}
       <View style={{ height: 3, backgroundColor: "#2E2E2E" }}>
         <Animated.View
           style={{ height: 3, backgroundColor: "#FFB300", width: barWidth }}
         />
       </View>
 
-      {/* Header */}
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: 20,
-          paddingBottom: 12,
-        }}
+      {/* Scrollable content so nothing gets clipped */}
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: 4 }}
+        showsVerticalScrollIndicator={false}
+        bounces={false}
       >
-        <View style={{ flex: 1, paddingRight: 12 }}>
-          <Text style={{ color: "#FFFFFF", fontWeight: "700", fontSize: 16 }}>
-            More From the developer
-          </Text>
-          <Text style={{ color: "#6B6B6B", fontSize: 13, marginTop: 2 }}>
-            Support Kountdown — go ad-free with Pro
-          </Text>
-        </View>
-        {canSkip ? (
-          <Pressable
-            onPress={onDone}
-            hitSlop={16}
-            style={{ backgroundColor: "#2E2E2E", borderRadius: 20, padding: 8 }}
-          >
-            <X color="#FFFFFF" size={18} />
-          </Pressable>
-        ) : (
-          <View
-            style={{
-              backgroundColor: "#2E2E2E",
-              borderRadius: 16,
-              paddingHorizontal: 14,
-              paddingVertical: 8,
-              alignItems: "center",
-              minWidth: 44,
-            }}
-          >
-            <Text style={{ color: "#FFB300", fontWeight: "700", fontSize: 18 }}>
-              {secondsLeft}
-            </Text>
-          </View>
-        )}
-      </View>
-
-      {/* App preview */}
-      <Pressable
-        onPress={() => Linking.openURL(app.url)}
-        style={{
-          marginHorizontal: 20,
-          borderRadius: 16,
-          overflow: "hidden",
-          height: 240,
-          backgroundColor: "#000",
-        }}
-      >
-        <Image
-          source={{ uri: app.image }}
-          style={{
-            width: "100%",
-            height: "250%",
-            top: 0,
-            position: "absolute",
-          }}
-          resizeMode="cover"
-        />
+        {/* Header */}
         <View
           style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            backgroundColor: "rgba(0,0,0,0.78)",
-            padding: 12,
             flexDirection: "row",
-            alignItems: "center",
             justifyContent: "space-between",
+            alignItems: "center",
+            padding: 20,
+            paddingBottom: 12,
           }}
         >
-          <View>
+          <View style={{ flex: 1, paddingRight: 12 }}>
             <Text style={{ color: "#FFFFFF", fontWeight: "700", fontSize: 16 }}>
-              {app.name}
+              More From the developer
             </Text>
-            <Text style={{ color: "#A0A0A0", fontSize: 12 }}>
-              {app.tagline}
+            <Text style={{ color: "#6B6B6B", fontSize: 13, marginTop: 2 }}>
+              Support Kountdown — go ad-free with Pro
             </Text>
           </View>
+          {canSkip ? (
+            <Pressable
+              onPress={onDone}
+              hitSlop={16}
+              style={{ backgroundColor: "#2E2E2E", borderRadius: 20, padding: 8 }}
+            >
+              <X color="#FFFFFF" size={18} />
+            </Pressable>
+          ) : (
+            <View
+              style={{
+                backgroundColor: "#2E2E2E",
+                borderRadius: 16,
+                paddingHorizontal: 14,
+                paddingVertical: 8,
+                alignItems: "center",
+                minWidth: 44,
+              }}
+            >
+              <Text style={{ color: "#FFB300", fontWeight: "700", fontSize: 18 }}>
+                {secondsLeft}
+              </Text>
+            </View>
+          )}
+        </View>
+
+        {/* App preview */}
+        <Pressable
+          onPress={() => Linking.openURL(app.url)}
+          style={{
+            marginHorizontal: 20,
+            borderRadius: 16,
+            overflow: "hidden",
+            height: 180,
+            backgroundColor: "#000",
+          }}
+        >
+          <Image
+            source={{ uri: app.image }}
+            style={{
+              width: "100%",
+              height: "250%",
+              top: 0,
+              position: "absolute",
+            }}
+            resizeMode="cover"
+          />
           <View
             style={{
-              backgroundColor: app.accent,
-              borderRadius: 10,
-              paddingHorizontal: 12,
-              paddingVertical: 7,
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              backgroundColor: "rgba(0,0,0,0.78)",
+              padding: 12,
               flexDirection: "row",
               alignItems: "center",
-              gap: 5,
+              justifyContent: "space-between",
             }}
           >
-            <ExternalLink color="#FFFFFF" size={13} />
-            <Text style={{ color: "#FFFFFF", fontWeight: "600", fontSize: 13 }}>
-              Visit
-            </Text>
+            <View>
+              <Text style={{ color: "#FFFFFF", fontWeight: "700", fontSize: 16 }}>
+                {app.name}
+              </Text>
+              <Text style={{ color: "#A0A0A0", fontSize: 12 }}>
+                {app.tagline}
+              </Text>
+            </View>
+            <View
+              style={{
+                backgroundColor: app.accent,
+                borderRadius: 10,
+                paddingHorizontal: 12,
+                paddingVertical: 7,
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 5,
+              }}
+            >
+              <ExternalLink color="#FFFFFF" size={13} />
+              <Text style={{ color: "#FFFFFF", fontWeight: "600", fontSize: 13 }}>
+                Visit
+              </Text>
+            </View>
           </View>
+        </Pressable>
+
+        {/* Dots */}
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            gap: 6,
+            marginVertical: 12,
+          }}
+        >
+          {AD_APPS.map((_, i) => (
+            <View
+              key={i}
+              style={{
+                width: i === activeApp ? 20 : 6,
+                height: 6,
+                borderRadius: 3,
+                backgroundColor: i === activeApp ? "#FFB300" : "#3E3E3E",
+              }}
+            />
+          ))}
         </View>
-      </Pressable>
 
-      {/* Dots */}
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "center",
-          gap: 6,
-          marginVertical: 18,
-        }}
-      >
-        {AD_APPS.map((_, i) => (
-          <View
-            key={i}
-            style={{
-              width: i === activeApp ? 20 : 6,
-              height: 6,
-              borderRadius: 3,
-              backgroundColor: i === activeApp ? "#FFB300" : "#3E3E3E",
-            }}
-          />
-        ))}
-      </View>
+        {/* Upgrade CTA */}
+        <Pressable
+          onPress={onUpgrade}
+          disabled={purchasing}
+          style={{
+            marginHorizontal: 20,
+            marginBottom: 10,
+            backgroundColor: "#FFB300",
+            borderRadius: 16,
+            padding: 16,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            opacity: purchasing ? 0.65 : 1,
+          }}
+        >
+          {purchasing ? (
+            <ActivityIndicator color="#121212" />
+          ) : (
+            <>
+              <Star color="#121212" size={18} fill="#121212" />
+              <Text style={{ color: "#121212", fontWeight: "700", fontSize: 16 }}>
+                Upgrade to Pro — €4.99
+              </Text>
+            </>
+          )}
+        </Pressable>
 
-      {/* Upgrade CTA */}
-      <Pressable
-        onPress={onUpgrade}
-        disabled={purchasing}
-        style={{
-          marginHorizontal: 20,
-          marginBottom: 10,
-          backgroundColor: "#FFB300",
-          borderRadius: 16,
-          padding: 16,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 8,
-          opacity: purchasing ? 0.65 : 1,
-        }}
-      >
-        {purchasing ? (
-          <ActivityIndicator color="#121212" />
-        ) : (
-          <>
-            <Star color="#121212" size={18} fill="#121212" />
-            <Text style={{ color: "#121212", fontWeight: "700", fontSize: 16 }}>
-              Upgrade to Pro — €4.99
-            </Text>
-          </>
-        )}
-      </Pressable>
-
-      {/* Inactive share button with countdown */}
-      <View
-        style={{
-          marginHorizontal: 20,
-          marginBottom: 20,
-          backgroundColor: "#2A2A2A",
-          borderRadius: 16,
-          padding: 16,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 8,
-          borderWidth: 1,
-          borderColor: "#3A3A3A",
-        }}
-      >
-        <Share2 color="#555" size={18} />
-        <Text style={{ color: "#555", fontWeight: "700", fontSize: 16 }}>
-          Share card
-        </Text>
-        <View style={{
-          backgroundColor: "#333",
-          borderRadius: 10,
-          paddingHorizontal: 8,
-          paddingVertical: 3,
-          marginLeft: 4,
-        }}>
-          <Text style={{ color: "#FFB300", fontWeight: "700", fontSize: 13 }}>
-            {secondsLeft}s
+        {/* Share button — active after countdown, inactive during ad */}
+        <Pressable
+          onPress={secondsLeft === 0 ? onDone : undefined}
+          style={{
+            marginHorizontal: 20,
+            marginBottom: 20,
+            backgroundColor: secondsLeft === 0 ? "#FFB300" : "#2A2A2A",
+            borderRadius: 16,
+            padding: 16,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            borderWidth: secondsLeft === 0 ? 0 : 1,
+            borderColor: "#3A3A3A",
+          }}
+        >
+          <Share2 color={secondsLeft === 0 ? "#121212" : "#555"} size={18} />
+          <Text style={{ color: secondsLeft === 0 ? "#121212" : "#555", fontWeight: "700", fontSize: 16 }}>
+            Share card
           </Text>
-        </View>
-      </View>
+          {secondsLeft > 0 && (
+            <View style={{
+              backgroundColor: "#333",
+              borderRadius: 10,
+              paddingHorizontal: 8,
+              paddingVertical: 3,
+              marginLeft: 4,
+            }}>
+              <Text style={{ color: "#FFB300", fontWeight: "700", fontSize: 13 }}>
+                {secondsLeft}s
+              </Text>
+            </View>
+          )}
+        </Pressable>
+      </ScrollView>
     </View>
   );
 }
@@ -451,9 +465,10 @@ function ShareCardInner({
         await MediaLibrary.saveToLibraryAsync(uri);
       }
 
-      // Share text + link via native Share Sheet (works reliably in all apps)
+      // Share image + text together via native Share Sheet
+      // On iOS, `url` sends the image file and `message` adds the caption text
       await Share.share(
-        { message, title: message },
+        { url: uri, message },
         { dialogTitle: "Share your Kountdown" },
       );
     } catch (e) {
@@ -518,14 +533,16 @@ function ShareCardInner({
       transparent
       onRequestClose={onClose}
     >
-      <View
-        style={{
-          flex: 1,
+      <ScrollView
+        contentContainerStyle={{
+          flexGrow: 1,
           backgroundColor: "rgba(0,0,0,0.9)",
           justifyContent: "center",
           alignItems: "center",
           paddingHorizontal: 24,
+          paddingVertical: 40,
         }}
+        keyboardShouldPersistTaps="handled"
       >
         <View
           style={{
@@ -765,7 +782,7 @@ function ShareCardInner({
             />
           )}
         </View>
-      </View>
+      </ScrollView>
     </Modal>
   );
 }

@@ -10,7 +10,7 @@ export const useStore = create(
 
       addDate: (dateData) => {
         const { savedDates, isPro } = get();
-        if (!isPro && savedDates.length >= 5) {
+        if (!isPro && savedDates.length >= 3) {
           return { error: "PRO_REQUIRED" };
         }
 

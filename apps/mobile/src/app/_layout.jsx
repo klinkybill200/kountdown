@@ -1,5 +1,6 @@
 import { useAuth } from "@/utils/auth/useAuth";
 import { useInAppPurchase } from "@/utils/iap";
+import { useStore } from "@/store/useStore";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
@@ -20,12 +21,20 @@ const queryClient = new QueryClient({
 
 export default function RootLayout() {
   const { initiate: initiateAuth, isReady: isAuthReady } = useAuth();
-  const { initiate: initiateIAP, isReady: isIAPReady } = useInAppPurchase();
+  const { initiate: initiateIAP, isReady: isIAPReady, isSubscribed } = useInAppPurchase();
+  const { setPro } = useStore();
 
   useEffect(() => {
     initiateAuth();
     initiateIAP();
   }, [initiateAuth, initiateIAP]);
+
+  // Sync RevenueCat subscription status to local store
+  useEffect(() => {
+    if (isIAPReady) {
+      setPro(!!isSubscribed);
+    }
+  }, [isSubscribed, isIAPReady, setPro]);
 
   const isReady = isAuthReady && isIAPReady;
 

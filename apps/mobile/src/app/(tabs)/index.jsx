@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import {
   View,
   Text,
@@ -62,7 +62,8 @@ const UNIT_LABELS = {
 export default function AgeCalcScreen() {
   const insets = useSafeAreaInsets();
   const { addDate, isPro } = useStore();
-  const { initiate } = useInAppPurchase();
+  const { initiate, isSubscribed } = useInAppPurchase();
+  const isProUser = isPro || !!isSubscribed;
 
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0]
@@ -73,13 +74,18 @@ export default function AgeCalcScreen() {
   const [unitIndex, setUnitIndex] = useState(0);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showUpgradeAd, setShowUpgradeAd] = useState(false);
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const currentUnit = UNITS[unitIndex];
 
   const stats = useMemo(() => {
     const d = new Date(selectedDate);
     if (!isValid(d)) return null;
-    const now = new Date();
     return {
       totalYears: differenceInYears(now, d),
       totalMonths: differenceInMonths(now, d),
@@ -89,7 +95,7 @@ export default function AgeCalcScreen() {
       totalMinutes: differenceInMinutes(now, d),
       totalSeconds: differenceInSeconds(now, d),
     };
-  }, [selectedDate]);
+  }, [selectedDate, now]);
 
   const heroValue = useMemo(() => {
     if (!stats) return "0";
@@ -122,6 +128,17 @@ export default function AgeCalcScreen() {
   };
 
   const handlePickPhoto = async (useCamera = false) => {
+    if (useCamera) {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Camera Permission Required",
+          "Please allow camera access in Settings to take photos.",
+          [{ text: "OK" }]
+        );
+        return;
+      }
+    }
     const options = {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -155,7 +172,7 @@ export default function AgeCalcScreen() {
     if (res.error === "PRO_REQUIRED") {
       Alert.alert(
         "Pro Required",
-        "You've reached the limit of 5 saved dates. Upgrade to Pro!",
+        "You've reached the limit of 3 saved dates. Upgrade to Pro for unlimited!",
         [
           { text: "Not now", style: "cancel" },
           { text: "Upgrade", onPress: handleUpgradePress },
@@ -445,7 +462,7 @@ export default function AgeCalcScreen() {
           </View>
         </View>
 
-        {!isPro && (
+        {!isProUser && (
           <Pressable
             onPress={handleUpgradePress}
             style={{
