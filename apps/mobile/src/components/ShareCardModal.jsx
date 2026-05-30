@@ -114,7 +114,7 @@ function mText(font, text) {
 }
 
 // ─── Ad overlay — a plain absolute View, NOT a Modal ─────────────────────────
-function AdOverlay({ onDone, onUpgrade, purchasing }) {
+function AdOverlay({ onDone, onUpgrade, purchasing, offerings }) {
   const [secondsLeft, setSecondsLeft] = useState(AD_DURATION);
   const [canSkip] = useState(true); // always skippable per App Store Guideline 2.5.18
   const [activeApp, setActiveApp] = useState(0);
@@ -329,7 +329,9 @@ function AdOverlay({ onDone, onUpgrade, purchasing }) {
             <>
               <Star color="#121212" size={18} fill="#121212" />
               <Text style={{ color: "#121212", fontWeight: "700", fontSize: 16 }}>
-                Upgrade to Pro — €4.99
+                {offerings?.current?.availablePackages?.[0]?.product?.priceString
+                  ? `Upgrade to Pro — ${offerings.current.availablePackages[0].product.priceString}`
+                  : "Upgrade to Pro"}
               </Text>
             </>
           )}
@@ -779,6 +781,7 @@ function ShareCardInner({
               onDone={handleAdDone}
               onUpgrade={handleUpgrade}
               purchasing={purchasing}
+              offerings={offerings}
             />
           )}
         </View>
