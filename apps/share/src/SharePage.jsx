@@ -501,7 +501,7 @@ export default function SharePage() {
           >
             {/* App Store */}
             <a
-              href="https://apps.apple.com"
+              href="https://apps.apple.com/us/app/kountdown-count-share/id6774498136"
               target="_blank"
               rel="noopener noreferrer"
               className="dl-btn"
@@ -534,7 +534,7 @@ export default function SharePage() {
               </div>
             </a>
 
-            {/* Google Play */}
+            {/* Google Play — hidden until Android launch
             <a
               href="https://play.google.com"
               target="_blank"
@@ -582,7 +582,7 @@ export default function SharePage() {
                   Google Play
                 </div>
               </div>
-            </a>
+            </a> */}
           </div>
         </div>
 
